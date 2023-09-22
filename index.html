@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangla Calendar</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">বাংলা ক্যালেন্ডার</h1>
+        <div class="calendar">
+            <div class="header">
+                <button id="prevMonth" class="nav-button">পূর্ববর্তী</button>
+                <h2 id="currentMonthYear" class="month-year"></h2>
+                <button id="nextMonth" class="nav-button">পরবর্তী</button>
+            </div>
+            <table id="calendarTable">
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহস্পতি</th>
+                        <th>শুক্র</th>
+                        <th>শনি</th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody">
+                    <!-- Calendar days will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+    text-align: center;
+    color: #0074d9;
+}
+
+.calendar {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.nav-button {
+    background-color: #0074d9;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.nav-button:hover {
+    background-color: #0056a0;
+}
+
+.month-year {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+table th {
+    background-color: #0074d9;
+    color: white;
+}
+
+#calendarBody td {
+    cursor: pointer;
+}
+
+#calendarBody td:hover {
+    background-color: #f0f0f0;
+}
+
+@media screen and (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    .calendar {
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .nav-button {
+        padding: 5px 10px;
+    }
+
+    .month-year {
+        font-size: 20px;
+    }
+}
+
+</style>
+
+<script>
+const months = [
+    "বৈশাখ",
+    "জ্যৈষ্ঠ",
+    "আষাঢ়",
+    "শ্রাবণ",
+    "ভাদ্র",
+    "আশ্বিন",
+    "কার্তিক",
+    "অগ্রহায়ণ",
+    "পৌষ",
+    "মাঘ",
+    "ফাল্গুন",
+    "চৈত্র",
+];
+
+const days = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহস্পতি", "শুক্র", "শনি"];
+
+const calendarBody = document.getElementById("calendarBody");
+const currentMonthYear = document.getElementById("currentMonthYear");
+const prevMonthButton = document.getElementById("prevMonth");
+const nextMonthButton = document.getElementById("nextMonth");
+
+const holidays = [
+    { date: "2023-10-15", name: "বিজয় দিবস" },
+    { date: "2023-11-07", name: "দীপাবলী" },
+    // Add more holidays here
+];
+
+let currentDate = new Date();
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
+
+function generateBanglaCalendar() {
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+    const daysInMonth = lastDayOfMonth.getDate();
+    const startingDay = firstDayOfMonth.getDay();
+
+    currentMonthYear.textContent = `${months[currentMonth]} ${toBengaliNumber(currentYear)}`;
+
+    let html = "";
+
+    for (let i = 0; i < startingDay; i++) {
+        html += "<td></td>";
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = `${currentYear}-${currentMonth + 1}-${day}`;
+        const isHoliday = isDateHoliday(date);
+        const dayInBengali = toBengaliNumber(day);
+        const className = isHoliday ? "holiday" : "";
+
+        html += `<td class="${className}">${dayInBengali}</td>`;
+
+        if ((startingDay + day - 1) % 7 === 6) {
+            html += "</tr><tr>";
+        }
+    }
+
+    calendarBody.innerHTML = html;
+}
+
+function isDateHoliday(date) {
+    return holidays.some((holiday) => holiday.date === date);
+}
+
+function toBengaliNumber(number) {
+    const bengaliNumbers = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+    const numberString = String(number);
+    return numberString.replace(/\d/g, (digit) => bengaliNumbers[digit]);
+}
+
+generateBanglaCalendar();
+
+prevMonthButton.addEventListener("click", () => {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    generateBanglaCalendar();
+});
+
+nextMonthButton.addEventListener("click", () => {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    generateBanglaCalendar();
+});
+
+</script>
